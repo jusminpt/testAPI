@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from app.data.properties_data import property_listings
+from app.models.property_models import PropertyCreate
+
 
 # Create a router instance
 router = APIRouter()
@@ -31,3 +33,20 @@ def update_property_description(property_id: int, property_update: PropertyUpdat
             return {"message": "Description updated successfully", "property": property}
     
     raise HTTPException(status_code=404, detail="Property not found")
+
+# Define the route for adding a new property
+@router.post("/properties")
+def add_property(property: PropertyCreate):
+    # Calculate the next available ID
+    if property_listings:
+        next_id = max(item["id"] for item in property_listings) + 1
+    else:
+        next_id = 1  # Start from 1 if the list is empty
+
+    # Create the new property with the auto-incremented ID
+    new_property = property.dict()
+    new_property["id"] = next_id
+
+    # Add the new property to the list
+    property_listings.append(new_property)
+    return {"message": "Property added successfully", "property": new_property}
