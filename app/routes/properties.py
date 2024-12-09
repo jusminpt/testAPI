@@ -50,3 +50,13 @@ def add_property(property: PropertyCreate):
     # Add the new property to the list
     property_listings.append(new_property)
     return {"message": "Property added successfully", "property": new_property}
+
+    # Define the route for deleting a property by ID
+@router.delete("/properties/{property_id}")
+def delete_property(property_id: int):
+    for property in property_listings:
+        if property["id"] == property_id:
+            property_listings.remove(property)  # Remove the property from the list
+            return {"message": f"Property with ID {property_id} deleted successfully"}
+    
+    raise HTTPException(status_code=404, detail="Property not found")
